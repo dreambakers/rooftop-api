@@ -1,6 +1,5 @@
 module.exports = {
-    emailSenderName: 'yenoma <noreply@yenoma.com>',
-    feedbackRecipient: 'feedback@yenoma.com',
+    emailSenderName: 'Jules <jules@therooftop.nyc>',
     emailSubjects: {
         signupVerification: 'Verify your email',
         forgotPassword: 'Password reset request received',
@@ -8,6 +7,5 @@ module.exports = {
     emailTemplates: {
         signupVerification: 'signup-verification',
         forgotPassword: 'forgot-password',
-        feedback: 'feedback'
     },
 }

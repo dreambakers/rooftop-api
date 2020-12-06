@@ -42,22 +42,24 @@ const signUp = async (req, res) => {
         });
 
         const user = await newUser.save();
-        // const token = await user.generateToken('verification', 'verificationToken');
-        // const result = await sendEmail(
-        //     newUser.email,
-        //     constants.emailSubjects.signupVerification,
-        //     constants.emailTemplates.signupVerification,
-        //     {
-        //         userEmail: newUser.email,
-        //         verificationUrl: `${process.env.FE_URL}/verify?verificationToken=` + token
-        //     }
-        // );
-
-        res.json({
-            user: {
-                id: user.id
+        const token = await user.generateToken('verification', 'verificationToken');
+        const result = await sendEmail(
+            newUser.email,
+            constants.emailSubjects.signupVerification,
+            constants.emailTemplates.signupVerification,
+            {
+                userEmail: newUser.email,
+                verificationUrl: `${process.env.FE_URL}/verify?verificationToken=` + token
             }
-        });
+        );
+
+        if (result) {
+            res.json({
+                user: {
+                    id: user.id
+                }
+            });
+        }
     }
 
     catch (error) {

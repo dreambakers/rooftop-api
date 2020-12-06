@@ -15,7 +15,8 @@ const sendEmail = async (to, subject, template, locals) => {
             locals: { ...locals },
             send: true,
             transport: {
-                host: "yenoma.com",
+                name: process.env.TRANSPORT_NAME,
+                host: process.env.TRANSPORT_HOST,
                 port: 465,
                 secure: true, // true for 465, false for other ports
                 auth: {
