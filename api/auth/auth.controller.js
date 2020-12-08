@@ -88,7 +88,7 @@ const login = async (req, res) => {
             });
         }
 
-        const token = await user.generateAuthToken(remember);
+        const token = await user.generateAuthToken();
         user.cleanupOldTokens();
         res.header('x-auth', token).send(user);
     } catch (error) {
@@ -276,6 +276,31 @@ const resetPassword = async (req, res) => {
     }
 }
 
+const onGoogleAuthentication = async (accessToken, refreshToken, profile, done) => {
+    try {
+        const email = profile.emails[0].value;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            let newUser = new User({
+                email,
+                username: profile.name.givenName + profile.id,
+                verified: true
+            });
+
+            newUser = await newUser.save();
+            const token = await newUser.generateAuthToken();
+            done(null, {token, id: newUser.id});
+        } else {
+            const token = await user.generateAuthToken();
+            user.cleanupOldTokens();
+            done(null, {token, id: user.id});
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
 module.exports = {
     login,
     signUp,
@@ -285,4 +310,5 @@ module.exports = {
     sendPasswordResetEmail,
     resetPassword,
     verifyPasswordResetToken,
+    onGoogleAuthentication
 }

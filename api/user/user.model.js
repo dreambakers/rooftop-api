@@ -28,7 +28,6 @@ const UserSchema = new Schema({
     },
     password: {
         type: String,
-        required: true,
         minlength: 6
     },
     tokens: [{
@@ -43,7 +42,6 @@ const UserSchema = new Schema({
         lastUse: { type: Date },
         remember: { type: Boolean, default: false }
     }],
-    country: String,
     verified: { type: Boolean, default: false },
     verificationToken: String,
     passwordResetToken: String,

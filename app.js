@@ -1,7 +1,9 @@
+require('dotenv').config();
+
 const express = require('express');
+const passport = require('passport');
 const routes = require('./routes/routes');
 const connectDB = require('./config/db');
-require('dotenv').config();
 
 const app = express();
 
@@ -10,6 +12,7 @@ connectDB();
 
 // Init Middleware
 app.use(express.json());
+app.use(passport.initialize());
 
 const port = process.env.PORT || 9000;
 
