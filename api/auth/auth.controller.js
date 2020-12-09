@@ -276,7 +276,7 @@ const resetPassword = async (req, res) => {
     }
 }
 
-const onGoogleAuthentication = async (accessToken, refreshToken, profile, done) => {
+const onPassportAuthentication = async (accessToken, refreshToken, profile, done) => {
     try {
         const email = profile.emails[0].value;
         const user = await User.findOne({ email });
@@ -285,7 +285,8 @@ const onGoogleAuthentication = async (accessToken, refreshToken, profile, done) 
             let newUser = new User({
                 email,
                 username: profile.name.givenName + profile.id,
-                verified: true
+                verified: true,
+                provider: profile.provider
             });
 
             newUser = await newUser.save();
@@ -301,6 +302,15 @@ const onGoogleAuthentication = async (accessToken, refreshToken, profile, done) 
     }
 }
 
+const onPassportAuthenticationFinish = (req, res) => {
+    res.header('x-auth', req.user.token).send(req.user);
+}
+
+const passportErrorHandler = (err, req, res, next) => {
+    console.log('error', 'Error while trying to login via Passport: ' + err);
+    res.status(500).send('Server error');
+}
+
 module.exports = {
     login,
     signUp,
@@ -310,5 +320,7 @@ module.exports = {
     sendPasswordResetEmail,
     resetPassword,
     verifyPasswordResetToken,
-    onGoogleAuthentication
+    onPassportAuthentication,
+    onPassportAuthenticationFinish,
+    passportErrorHandler
 }

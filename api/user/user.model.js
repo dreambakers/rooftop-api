@@ -39,10 +39,10 @@ const UserSchema = new Schema({
             type: String,
             required: true
         },
-        lastUse: { type: Date },
-        remember: { type: Boolean, default: false }
+        lastUse: { type: Date }
     }],
     verified: { type: Boolean, default: false },
+    provider: String,
     verificationToken: String,
     passwordResetToken: String,
 },{

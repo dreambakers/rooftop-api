@@ -1,17 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var passport = require('passport'),
+    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
+    FacebookStrategy = require('passport-facebook').Strategy;
 const { check } = require('express-validator');
 const controller = require('./auth.controller')
 const authenticate = require('../../middleware/authenticate');
 
 passport.use(new GoogleStrategy({
-    clientID: `${process.env.GOOGLE_CLIENT_ID}`,
-    clientSecret: `${process.env.GOOGLE_CLIENT_SECRET}`,
-    callbackURL: `${process.env.GOOGLE_CB_URL}`
-  },
-  controller.onGoogleAuthentication
+        clientID: `${process.env.GOOGLE_CLIENT_ID}`,
+        clientSecret: `${process.env.GOOGLE_CLIENT_SECRET}`,
+        callbackURL: `${process.env.GOOGLE_CB_URL}`
+    },
+    controller.onPassportAuthentication
+));
+
+passport.use(new FacebookStrategy({
+        clientID: `${process.env.FACEBOOK_CLIENT_ID}`,
+        clientSecret: `${process.env.FACEBOOK_CLIENT_SECRET}`,
+        callbackURL: `${process.env.FACEBOOK_CB_URL}`,
+        profileFields: ['id', 'emails', 'name']
+    },
+    controller.onPassportAuthentication
 ));
 
 router
@@ -37,9 +47,18 @@ router
             failureRedirect: '/login',
             session: false
         }),
-        function (req, res) {
-            res.header('x-auth', req.user.token).send(req.user);
-        }
+        controller.passportErrorHandler,
+        controller.onPassportAuthenticationFinish
     )
+    .get('/facebook', passport.authenticate('facebook', {
+        scope: ['email']
+    }))
+    .get('/facebook/callback', passport.authenticate('facebook', {
+            failureRedirect: '/login',
+            session: false
+        }),
+        controller.passportErrorHandler,
+        controller.onPassportAuthenticationFinish
+    );
 
 module.exports = router;
