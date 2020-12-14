@@ -42,7 +42,7 @@ const signUp = async (req, res) => {
         });
 
         const user = await newUser.save();
-        const token = await user.generateToken('verification', 'verificationToken');
+        const token = await user.generateToken('verification', 'verificationToken', '48h');
         const result = await sendEmail(
             newUser.email,
             constants.emailSubjects.signupVerification,
@@ -53,7 +53,7 @@ const signUp = async (req, res) => {
             }
         );
 
-        if (result) {
+        if (result.accepted && result.accepted.length) {
             res.json({
                 user: {
                     id: user.id
@@ -105,11 +105,17 @@ const logout = async ({ user, token }, res) => {
         });
     } catch (error) {
         console.log('An error occurred logging out the user', error);
+        res.status(500).send('Server error');
     }
 }
 
 const verifySignup = async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
         const user = await User.findOne({ verificationToken: req.body.verificationToken });
         if (user) {
             try {
@@ -123,39 +129,43 @@ const verifySignup = async (req, res) => {
                         verificationToken: null
                     },
                     {
-                    new: true
+                        new: true
                     }
                 );
                 return res.json({
-                    success: !!result.verified,
+                    user: {
+                        id: result.id,
+                        verified: result.verified
+                    }
                 });
             } catch(err) {
-                return res.json({
-                    success: 0,
-                    invalidToken: true
+                return res.status(400).json({
+                    errors: [{ msg: 'Invalid verification token' }]
                 });
             }
         }
-        res.json({
-            success: 0,
-            userNotFound: true
+
+        return res.status(400).json({
+            errors: [{ msg: 'No user found against the provided token' }]
         });
     } catch (error) {
         console.log('An error occurred verifying the user', error);
-        res.json({
-            success: 0,
-        });
+        res.status(500).send('Server error');
     }
 }
 
 const sendSignupVerificationEmail = async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
         const user = await User.findOne({ email: req.body.email });
         if (user) {
             if (user.verified) {
-                return res.json({
-                    success: 1,
-                    alreadyVerified: true
+                return res.status(400).json({
+                    errors: [{ msg: 'User is already verified' }]
                 });
             } else {
                 const token = await user.generateToken('verification', 'verificationToken', '48h');
@@ -166,24 +176,24 @@ const sendSignupVerificationEmail = async (req, res) => {
                     {
                         userEmail: req.body.email,
                         verificationUrl: `${process.env.FE_URL}/verify?verificationToken=` + token
-                    },
-                    req.body.language
+                    }
                 );
-                res.json({
-                    success: result.accepted.length
-                });
+                if (result.accepted && result.accepted.length) {
+                    res.json({
+                        user: {
+                            id: user.id
+                        }
+                    });
+                }
             }
         } else {
-            res.json({
-                success: 1,
-                userNotFound: true
+            return res.status(400).json({
+                errors: [{ msg: 'No user found against the provided email' }]
             });
         }
     } catch (error) {
         console.log('An error occurred sending the verification email', error);
-        res.json({
-            success: 0,
-        });
+        res.status(500).send('Server error');
     }
 }
 

@@ -35,8 +35,12 @@ router
         check('password', 'Password is required').exists()
     ], controller.login)
     .post('/logout', authenticate, controller.logout)
-    .post('/verifySignup', controller.verifySignup)
-    .post('/sendSignupVerificationEmail', controller.sendSignupVerificationEmail)
+    .post('/verifySignup', [
+        check('verificationToken', 'Verification token is required').exists(),
+    ], controller.verifySignup)
+    .post('/sendSignupVerificationEmail', [
+        check('email', 'Please include a valid email').isEmail(),
+    ], controller.sendSignupVerificationEmail)
     .post('/requestPasswordResetEmail', controller.sendPasswordResetEmail)
     .post('/verifyPasswordResetToken', controller.verifyPasswordResetToken)
     .post('/resetPassword', controller.resetPassword)
