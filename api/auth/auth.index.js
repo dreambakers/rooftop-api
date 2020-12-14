@@ -41,9 +41,16 @@ router
     .post('/sendSignupVerificationEmail', [
         check('email', 'Please include a valid email').isEmail(),
     ], controller.sendSignupVerificationEmail)
-    .post('/requestPasswordResetEmail', controller.sendPasswordResetEmail)
-    .post('/verifyPasswordResetToken', controller.verifyPasswordResetToken)
-    .post('/resetPassword', controller.resetPassword)
+    .post('/sendPasswordResetEmail', [
+        check('email', 'Please include a valid email').isEmail(),
+    ], controller.sendPasswordResetEmail)
+    .post('/verifyPasswordResetToken',[
+        check('passwordResetToken', 'Password reset token is required').exists(),
+    ], controller.verifyPasswordResetToken)
+    .post('/resetPassword', [
+        check('passwordResetToken', 'Password reset token is required').exists(),
+        check('password', 'Password is required').exists()
+    ], controller.resetPassword)
     .get('/google', passport.authenticate('google', {
         scope: ['profile', 'email']
     }))

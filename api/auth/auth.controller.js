@@ -57,7 +57,8 @@ const signUp = async (req, res) => {
             res.json({
                 user: {
                     id: user.id
-                }
+                },
+                msg: "Email sent"
             });
         }
     }
@@ -180,9 +181,7 @@ const sendSignupVerificationEmail = async (req, res) => {
                 );
                 if (result.accepted && result.accepted.length) {
                     res.json({
-                        user: {
-                            id: user.id
-                        }
+                        msg: "Email sent"
                     });
                 }
             }
@@ -199,6 +198,10 @@ const sendSignupVerificationEmail = async (req, res) => {
 
 const sendPasswordResetEmail = async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         const user = await User.findOne({ email: req.body.email });
         if (user) {
                 const token = await user.generateToken('password', 'passwordResetToken', '48h');
@@ -208,54 +211,58 @@ const sendPasswordResetEmail = async (req, res) => {
                     constants.emailTemplates.forgotPassword,
                     {
                         passwordResetUrl: `${process.env.FE_URL}/password-reset?passwordResetToken=` + token
-                    },
-                    req.body.language
+                    }
                 );
-                res.json({
-                    success: result.accepted.length
-                });
+                if (result.accepted && result.accepted.length) {
+                    res.json({
+                        msg: "Email sent"
+                    });
+                }
         } else {
-            res.json({
-                success: 1,
-                userNotFound: true
+            return res.status(400).json({
+                errors: [{ msg: 'No user found against the provided email' }]
             });
         }
     } catch (error) {
         console.log('An error occurred sending the password reset email', error);
-        res.json({
-            success: 0,
-        });
+        res.status(500).send('Server error');
     }
 }
 
 const verifyPasswordResetToken = async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         const user = await User.findOne({ passwordResetToken: req.body.passwordResetToken });
         if (user) {
             try {
                 const decoded = jwt.verify(req.body.passwordResetToken, process.env.JWT_SECRET);
                 return res.json({
-                    success: 1
+                    msg: "Token valid"
                 });
             } catch(err) {
-                return res.json({
-                    success: 0,
+                return res.status(400).json({
+                    errors: [{ msg: 'Invalid password reset token' }]
                 });
             }
         }
-        res.json({
-            success: 0,
+        return res.status(400).json({
+            errors: [{ msg: 'No user found against the provided token' }]
         });
     } catch (error) {
-        console.log('An error occurred sending the password reset email', error);
-        res.json({
-            success: 0,
-        });
+        console.log('An error occurred verifying the password reset token', error);
+        res.status(500).send('Server error');
     }
 }
 
 const resetPassword = async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         const user = await User.findOne({ passwordResetToken: req.body.passwordResetToken });
         if (user) {
             try {
@@ -263,26 +270,21 @@ const resetPassword = async (req, res) => {
                 user.password = req.body.newPassword;
                 user.passwordResetToken = null;
                 const result = await user.save();
-                res.json({
-                    success: 1
+                return res.json({
+                    msg: "Password updated"
                 });
             } catch(err) {
-                res.json({
-                    success: 0,
-                    invalidToken: true
+                return res.status(400).json({
+                    errors: [{ msg: 'Invalid password reset token' }]
                 });
             }
-        } else {
-            res.json({
-                success: 0,
-                userNotFound: true
-            });
         }
-    } catch (error) {
-        console.log('An error occurred sending the password reset email', error);
-        res.json({
-            success: 0,
+        return res.status(400).json({
+            errors: [{ msg: 'No user found against the provided token' }]
         });
+    } catch (error) {
+        console.log('An error occurred resetting the password', error);
+        res.status(500).send('Server error');
     }
 }
 
