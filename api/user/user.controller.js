@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const { User } = require('./user.model');
+const winston = require('../../config/winston');
 
 const getProfile = async (req, res) => {
     try {
@@ -11,8 +12,8 @@ const getProfile = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log('An error occurred getting the user profile', error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred getting the user profile', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 
@@ -43,8 +44,8 @@ const changePassword = async (req, res) => {
             throw err;
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred while changing the password', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 

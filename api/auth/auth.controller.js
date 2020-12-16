@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 
 const { User } = require('../user/user.model');
 const { sendEmail } = require('../../utility/mail');
+const winston = require('../../config/winston');
 const constants = require('../../constants');
 
 const signUp = async (req, res) => {
@@ -64,8 +65,8 @@ const signUp = async (req, res) => {
     }
 
     catch (error) {
-        console.log(error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred while signing up the new user', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 
@@ -93,8 +94,8 @@ const login = async (req, res) => {
         user.cleanupOldTokens();
         res.header('x-auth', token).send(user);
     } catch (error) {
-        console.log(error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred while logging in the user', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 
@@ -105,8 +106,8 @@ const logout = async ({ user, token }, res) => {
             success: 1
         });
     } catch (error) {
-        console.log('An error occurred logging out the user', error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred logging out the user', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 
@@ -150,8 +151,8 @@ const verifySignup = async (req, res) => {
             errors: [{ msg: 'No user found against the provided token' }]
         });
     } catch (error) {
-        console.log('An error occurred verifying the user', error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred verifying the user', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 
@@ -191,8 +192,8 @@ const sendSignupVerificationEmail = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log('An error occurred sending the verification email', error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred sending the verification email', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 
@@ -224,8 +225,8 @@ const sendPasswordResetEmail = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log('An error occurred sending the password reset email', error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred sending the password reset email', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 
@@ -252,8 +253,8 @@ const verifyPasswordResetToken = async (req, res) => {
             errors: [{ msg: 'No user found against the provided token' }]
         });
     } catch (error) {
-        console.log('An error occurred verifying the password reset token', error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred verifying the password reset token', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 
@@ -283,8 +284,8 @@ const resetPassword = async (req, res) => {
             errors: [{ msg: 'No user found against the provided token' }]
         });
     } catch (error) {
-        console.log('An error occurred resetting the password', error);
-        res.status(500).send('Server error');
+        winston.error('An error occurred resetting the password', error);
+        res.status(500).json({ msg: 'Server Error' });
     }
 }
 
@@ -319,8 +320,8 @@ const onPassportAuthenticationFinish = (req, res) => {
 }
 
 const passportErrorHandler = (err, req, res, next) => {
-    console.log('error', 'Error while trying to login via Passport: ' + err);
-    res.status(500).send('Server error');
+    winston.error('Error while trying to login via Passport', err);
+    res.status(500).json({ msg: 'Server Error' });
 }
 
 module.exports = {

@@ -2,10 +2,16 @@ require('dotenv').config();
 
 const express = require('express');
 const passport = require('passport');
+const morgan = require('morgan');
 const routes = require('./routes/routes');
+const winston = require('./config/winston');
+
 const connectDB = require('./config/db');
 
 const app = express();
+
+// Logging Middleware
+app.use(morgan('combined', { stream: winston.stream }));
 
 // Connect Database
 connectDB();
