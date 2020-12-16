@@ -5,8 +5,10 @@ const controller = require('./user.controller')
 const authenticate = require('../../middleware/authenticate');
 
 router
-    .get('/getProfile', authenticate, controller.getProfile)
-    .post('/changePassword', authenticate, controller.changePassword)
-    .post('/updateProfile', authenticate, controller.updateProfile)
+    .get('/', authenticate, controller.getProfile)
+    .post('/changePassword', [ authenticate, [
+        check('oldPassword', 'Old password is required').exists(),
+        check('newPassword', 'New password is required').exists()]
+    ], controller.changePassword);
 
 module.exports = router;

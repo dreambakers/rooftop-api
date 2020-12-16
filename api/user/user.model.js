@@ -56,10 +56,7 @@ UserSchema.methods.toJSON = function () {
     return {
         email: userObject.email,
         username: userObject.username,
-        country: userObject.country,
         _id: userObject._id,
-        subscription: userObject.subscription,
-        readonly: userObject.readonly
     };
 };
 
@@ -76,24 +73,6 @@ UserSchema.methods.generateToken = function (access, key, expiresIn = '365d') {
     const token = jwt.sign({ _id: user._id.toHexString(), access }, process.env.JWT_SECRET, { expiresIn }).toString();
     user[key] = token;
     return user.save().then(() => token);
-};
-
-UserSchema.statics.findByToken = function (token) {
-    let User = this;
-    let decoded;
-
-    try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-    }
-    catch (e) {
-        return Promise.reject();
-    }
-
-    return User.findOne({
-        '_id': decoded._id,
-        'tokens.token': token,
-        'tokens.access': 'auth',
-    });
 };
 
 UserSchema.statics.findByCredentials = function (username, password) {
@@ -137,7 +116,7 @@ UserSchema.methods.removeToken = function (token) {
         // pull from token array the token object with the same properties as the token passed
         // into the method
         tokens: {
-          // whole token object is remove
+          // whole token object is removed
           token,
         },
       },
