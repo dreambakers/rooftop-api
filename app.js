@@ -27,7 +27,7 @@ app.get('/', (req, res) => { res.send('Rooftop API is running.') });
 app.use('/', routes);
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  winston.info(`Server running on port ${port}`);
 });
 
 module.exports = { app }

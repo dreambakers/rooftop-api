@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const winston = require('./winston');
 
 const connectDB = async () => {
 	try {
@@ -9,9 +10,9 @@ const connectDB = async () => {
 			useUnifiedTopology: true
 		});
 
-		console.log('MongoDB Connected...');
+		winston.info('MongoDB Connected...');
 	} catch (err) {
-		console.error(err.message);
+		winston.error('Error connecting to MongoDB', err);
 		// Exit process with failure
 		process.exit(1);
 	}

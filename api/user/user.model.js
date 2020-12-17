@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const winston = require('../../config/winston');
 
 const UserSchema = new Schema({
     username: {
@@ -135,7 +136,7 @@ UserSchema.methods.cleanupOldTokens = async function() {
         }).exec();
         return true;
     } catch (error) {
-        console.log('Error performing token cleanup', error);
+        winston.error('Error performing token cleanup', error);
         return Promise.reject();
     }
 };
