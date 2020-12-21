@@ -18,7 +18,10 @@ const upsertParty = async (req, res) => {
                 });
             } else {
                 try {
-                    const party = await Party.findByIdAndUpdate(req.params.id, req.body).exec();
+                    const party = await Party.findOneAndUpdate({
+                        _id: req.params.id,
+                        createdBy: req.user._id
+                    }, req.body).exec();
                     if (!party) {
                         return res.status(400).json({
                             errors: [{ msg: 'No party found against provided ID' }]
@@ -50,6 +53,19 @@ const upsertParty = async (req, res) => {
 const getParties = async (req, res) => {
     try {
         const parties = await Party.find({ endDateTime: {$gt: new Date()} }).populate('createdBy ratings.by').exec();
+        res.json({
+            msg: 'Parties fetched',
+            parties
+        });
+    } catch (error) {
+        winston.error('An error occurred while getting the parties', error);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+const getMyParties = async (req, res) => {
+    try {
+        const parties = await Party.find({ endDateTime: {$gt: new Date()}, createdBy: req.user._id }).populate('createdBy ratings.by').exec();
         res.json({
             msg: 'Parties fetched',
             parties
@@ -110,5 +126,6 @@ const rateParty = async (req, res) => {
 module.exports = {
     upsertParty,
     getParties,
+    getMyParties,
     rateParty
 }

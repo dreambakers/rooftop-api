@@ -63,6 +63,7 @@ router
       ]
     ], controller.upsertParty)
     .get('/', controller.getParties)
+    .get('/my/', authenticate, controller.getMyParties)
     .post('/rate/:id', [
       authenticate, [
         check('rating', 'Rating must be an int between 1 and 5').isInt({ min: 1, max: 5 }),
