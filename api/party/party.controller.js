@@ -33,7 +33,7 @@ const upsertParty = async (req, res) => {
         } 
         // Creating new party
         else {
-            let party = new Party(req.body);
+            let party = new Party({...req.body, createdBy: req.user._id });
             party = await party.save();
 
             res.json({
@@ -47,6 +47,20 @@ const upsertParty = async (req, res) => {
     }
 }
 
+const getParties = async (req, res) => {
+    try {
+        const parties = await Party.find({ endDateTime: {$gt: new Date()} }).populate('createdBy').exec();
+        res.json({
+            msg: 'Parties fetched',
+            parties
+        });
+    } catch (error) {
+        winston.error('An error occurred while getting the parties', error);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 module.exports = {
     upsertParty,
+    getParties
 }

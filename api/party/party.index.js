@@ -61,6 +61,7 @@ router
             .isInt({ min: constants.venueSize.min, max: constants.venueSize.max }),
         checkSchema(Schema)
       ]
-    ], controller.upsertParty);
+    ], controller.upsertParty)
+    .get('/', controller.getParties);
 
 module.exports = router;

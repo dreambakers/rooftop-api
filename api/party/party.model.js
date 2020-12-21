@@ -31,7 +31,8 @@ const partySchema = new Schema({
     },
     shortId: String,
     startDateTime: Date,
-    endDateTime: Date
+    endDateTime: Date,
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 },{
     timestamps: true
 });
