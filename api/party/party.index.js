@@ -69,5 +69,6 @@ router
         check('rating', 'Rating must be an int between 1 and 5').isInt({ min: 1, max: 5 }),
       ]
     ], controller.rateParty)
+    .delete('/:id', authenticate, controller.deleteParty);
 
 module.exports = router;

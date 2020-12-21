@@ -82,25 +82,22 @@ const rateParty = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-
         if (!ObjectID.isValid(req.params.id)) {
             return res.status(400).json({
                 errors: [{ msg: 'Invalid Party ID' }]
             });
         } 
         let party = await Party.findById(req.params.id).exec();
-        const newRating = {
-            by: req.user._id,
-            rating: req.body.rating,
-            review: req.body.review
-        };
-
         if (!party) {
             return res.status(400).json({
                 errors: [{ msg: 'No party found against provided ID' }]
             });
         }
-
+        const newRating = {
+            by: req.user._id,
+            rating: req.body.rating,
+            review: req.body.review
+        };
         if (!party.ratings.length) {
             party.ratings.push(newRating);
         } else {
@@ -111,7 +108,6 @@ const rateParty = async (req, res) => {
                 party.ratings.push(newRating);
             }
         }
-
         party = await party.save();
         res.json({
             msg: 'Rating submitted',
@@ -123,9 +119,36 @@ const rateParty = async (req, res) => {
     }
 }
 
+const deleteParty = async (req, res) => {
+    try {
+        if (!ObjectID.isValid(req.params.id)) {
+            return res.status(400).json({
+                errors: [{ msg: 'Invalid Party ID' }]
+            });
+        } 
+        let party = await Party.findOneAndDelete({
+            _id: req.params.id,
+            createdBy: req.user._id
+        }).exec();
+        if (!party) {
+            return res.status(400).json({
+                errors: [{ msg: 'No party found against provided ID' }]
+            });
+        }
+        res.json({
+            msg: 'Party deleted',
+            party
+        });
+    } catch (error) {
+        winston.error('An error occurred while deleting the party', error);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 module.exports = {
     upsertParty,
     getParties,
     getMyParties,
-    rateParty
+    rateParty,
+    deleteParty
 }
