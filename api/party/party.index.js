@@ -31,7 +31,7 @@ const Schema = {
     "endDateTime": {
       custom: {
         options: (value) => {
-          return value && moment(value).isValid()
+          return value && moment(value, moment.ISO_8601).isValid()
         },
         errorMessage: "End date time should be valid"
       }
@@ -39,7 +39,7 @@ const Schema = {
     "startDateTime": {
       custom: {
         options: (value, { req }) => {
-          if (!moment(value).isValid()) {
+          if (!moment(value, moment.ISO_8601).isValid()) {
             return false;
           } else {
             return moment(value).isAfter(moment()) && moment(value).isBefore(moment(req.body.endDateTime))
@@ -54,7 +54,7 @@ router
     .post('/:id?', [ authenticate, [
         check('title', 'Title is required').exists(),
         check('location', 'Location is required').exists(),
-        check('price', 'Price must be an int').isNumeric(),
+        check('price', 'Price must be a number').isNumeric(),
         check('about', 'About is required').exists(),
         check('crowdCaution', 'Crowd caution must be a boolean').isBoolean(),
         check('venueSize', `Venue size must be a number between ${constants.venueSize.min} and ${constants.venueSize.max}`)
@@ -62,6 +62,11 @@ router
         checkSchema(Schema)
       ]
     ], controller.upsertParty)
-    .get('/', controller.getParties);
+    .get('/', controller.getParties)
+    .post('/rate/:id', [
+      authenticate, [
+        check('rating', 'Rating must be an int between 1 and 5').isInt({ min: 1, max: 5 }),
+      ]
+    ], controller.rateParty)
 
 module.exports = router;

@@ -49,7 +49,7 @@ const upsertParty = async (req, res) => {
 
 const getParties = async (req, res) => {
     try {
-        const parties = await Party.find({ endDateTime: {$gt: new Date()} }).populate('createdBy').exec();
+        const parties = await Party.find({ endDateTime: {$gt: new Date()} }).populate('createdBy ratings.by').exec();
         res.json({
             msg: 'Parties fetched',
             parties
@@ -60,7 +60,55 @@ const getParties = async (req, res) => {
     }
 }
 
+const rateParty = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        if (!ObjectID.isValid(req.params.id)) {
+            return res.status(400).json({
+                errors: [{ msg: 'Invalid Party ID' }]
+            });
+        } 
+        let party = await Party.findById(req.params.id).exec();
+        const newRating = {
+            by: req.user._id,
+            rating: req.body.rating,
+            review: req.body.review
+        };
+
+        if (!party) {
+            return res.status(400).json({
+                errors: [{ msg: 'No party found against provided ID' }]
+            });
+        }
+
+        if (!party.ratings.length) {
+            party.ratings.push(newRating);
+        } else {
+            const ratingIndex = party.ratings.findIndex(rating => rating.by.toString() === req.user._id);
+            if (ratingIndex >= 0) {
+                party.ratings[ratingIndex] = newRating;
+            } else {
+                party.ratings.push(newRating);
+            }
+        }
+
+        party = await party.save();
+        res.json({
+            msg: 'Rating submitted',
+            party
+        });
+    } catch (error) {
+        winston.error('An error occurred while rating the party', error);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 module.exports = {
     upsertParty,
-    getParties
+    getParties,
+    rateParty
 }

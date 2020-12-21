@@ -33,6 +33,11 @@ const partySchema = new Schema({
     startDateTime: Date,
     endDateTime: Date,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    ratings: [{
+        by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        rating: Number,
+        review: String
+    }]
 },{
     timestamps: true
 });
