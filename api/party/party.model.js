@@ -29,7 +29,9 @@ const partySchema = new Schema({
         type: String,
         enum: constants.partyTypes
     },
-    shortId: String
+    shortId: String,
+    startDateTime: Date,
+    endDateTime: Date
 },{
     timestamps: true
 });
