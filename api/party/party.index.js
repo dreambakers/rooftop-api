@@ -62,7 +62,28 @@ router
         checkSchema(Schema)
       ]
     ], controller.upsertParty)
-    .get('/', controller.getParties)
+    .get('/', [
+      check('filter.venueSize', `Venue size must be a number between ${constants.venueSize.min} and ${constants.venueSize.max}`).optional()
+          .isInt({ min: constants.venueSize.min, max: constants.venueSize.max }),
+      check('filter.price', 'Price must be a number').optional().isNumeric(),
+      check('filter.crowdCaution', 'Crowd caution must be a boolean').optional().isBoolean(),
+      checkSchema({
+        "filter.bourough": {
+          optional: { options: { nullable: true } },
+          isIn: {
+            options: [constants.bouroughs],
+            errorMessage: `Invalid Bourough. Must be one of the following: ${constants.bouroughs.join(', ')}`
+          }
+        },
+        "filter.crowdControl": {
+          optional: { options: { nullable: true } },
+          isIn: {
+            options: [constants.crowdControls],
+            errorMessage: `Invalid crowd control. Must be one of the following: ${constants.crowdControls.join(', ')}`
+          }
+        },
+      })
+    ], controller.getParties)
     .get('/my/', authenticate, controller.getMyParties)
     .post('/rate/:id', [
       authenticate, [

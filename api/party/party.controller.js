@@ -52,7 +52,21 @@ const upsertParty = async (req, res) => {
 
 const getParties = async (req, res) => {
     try {
-        const parties = await Party.find({ endDateTime: {$gt: new Date()} }).populate('createdBy ratings.by').exec();
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const filter = {};
+        if (req.body.filter && Object.keys(req.body.filter).length) {
+            for (let [key, value] of Object.entries(req.body.filter)) {
+                if (isNaN(value) || typeof value === "boolean") {
+                    filter[key] = value;
+                } else {
+                    filter[key] = { $lte: value }
+                }
+            }
+        }
+        const parties = await Party.find({ endDateTime: {$gt: new Date()}, ...filter }).populate('createdBy ratings.by').exec();
         res.json({
             msg: 'Parties fetched',
             parties
