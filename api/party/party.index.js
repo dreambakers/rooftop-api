@@ -24,8 +24,8 @@ const Schema = {
     "type": {
         in: 'body',
         isIn: {
-          options: [constants.partyTypes],
-          errorMessage: `Invalid party type. Must be one of the following: ${constants.partyTypes.join(', ')}`
+          options: [Object.values(constants.partyTypes)],
+          errorMessage: `Invalid party type. Must be one of the following: ${Object.values(constants.partyTypes).join(', ')}`
         }
     },
     "endDateTime": {

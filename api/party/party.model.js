@@ -27,7 +27,7 @@ const partySchema = new Schema({
     about: String,
     type: {
         type: String,
-        enum: constants.partyTypes
+        enum: Object.values(constants.partyTypes)
     },
     shortId: String,
     startDateTime: Date,

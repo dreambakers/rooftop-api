@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const { Party } = require('./party.model');
 const winston = require('../../config/winston');
+const constants = require('../../constants');
 const ObjectID = require("mongodb").ObjectID;
 
 const upsertParty = async (req, res) => {
@@ -66,7 +67,7 @@ const getParties = async (req, res) => {
                 }
             }
         }
-        const parties = await Party.find({ endDateTime: {$gt: new Date()}, ...filter }).populate('createdBy ratings.by').exec();
+        const parties = await Party.find({ endDateTime: {$gt: new Date()}, type: constants.partyTypes.public, ...filter }).populate('createdBy ratings.by').exec();
         res.json({
             msg: 'Parties fetched',
             parties

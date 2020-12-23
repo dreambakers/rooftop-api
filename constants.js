@@ -11,7 +11,10 @@ module.exports = {
     bouroughs: ['Queens', 'Bronx', 'Brooklyn', 'Manhattan', 'Long Island'],
     vibes : ['Turnt Up', 'Mixer', 'Kick Back'],
     crowdControls: ['Moshpit', 'Packed', 'Spaced', 'Kick back', 'Mixer'],
-    partyTypes: ['Public', 'Private'],
+    partyTypes: {
+        public: 'Public',
+        private: 'Private'
+    },
     venueSize: {
         min: 100,
         max: 10000
