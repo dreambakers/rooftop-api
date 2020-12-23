@@ -83,7 +83,7 @@ const getParties = async (req, res) => {
 
 const getMyParties = async (req, res) => {
     try {
-        const parties = await Party.find({ endDateTime: {$gt: new Date()}, createdBy: req.user._id }).populate('createdBy ratings.by').exec();
+        const parties = await Party.find({ endDateTime: {$gt: new Date()}, createdBy: req.user._id }).populate('ratings.by').exec();
         res.json({
             msg: 'Parties fetched',
             parties
