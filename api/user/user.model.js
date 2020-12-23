@@ -46,6 +46,10 @@ const UserSchema = new Schema({
     provider: String,
     verificationToken: String,
     passwordResetToken: String,
+    parties: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Party' 
+    }]
 },{
     timestamps: true
 });
@@ -58,6 +62,7 @@ UserSchema.methods.toJSON = function () {
         email: userObject.email,
         username: userObject.username,
         _id: userObject._id,
+        parties: userObject.parties
     };
 };
 

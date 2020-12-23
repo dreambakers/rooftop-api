@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const { Party } = require('./party.model');
+const { User } = require('../user/user.model');
 const winston = require('../../config/winston');
 const constants = require('../../constants');
 const ObjectID = require("mongodb").ObjectID;
@@ -39,11 +40,13 @@ const upsertParty = async (req, res) => {
         else {
             let party = new Party({...req.body, createdBy: req.user._id });
             party = await party.save();
-
-            res.json({
-                msg: 'Party created',
-                party
-            });
+            if (party) {
+                await User.findByIdAndUpdate(req.user._id, { $push: { parties: party } }).exec();
+                res.json({
+                    msg: 'Party created',
+                    party
+                });
+            }
         }
     } catch (error) {
         winston.error('An error occurred while creating the party', error);
@@ -141,10 +144,17 @@ const deleteParty = async (req, res) => {
                 errors: [{ msg: 'Invalid Party ID' }]
             });
         } 
-        let party = await Party.findOneAndDelete({
-            _id: req.params.id,
-            createdBy: req.user._id
-        }).exec();
+        const [ party, user ] = await Promise.all([
+            Party.findOneAndDelete({
+                _id: req.params.id,
+                createdBy: req.user._id
+            }).exec(),
+            User.findByIdAndUpdate(req.user._id, {
+                $pull: {
+                    parties: new ObjectID(req.params.id)
+                }
+            }).exec()
+        ]);
         if (!party) {
             return res.status(400).json({
                 errors: [{ msg: 'No party found against provided ID' }]
