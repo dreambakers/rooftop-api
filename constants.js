@@ -9,7 +9,6 @@ module.exports = {
         forgotPassword: 'forgot-password',
     },
     bouroughs: ['Queens', 'Bronx', 'Brooklyn', 'Manhattan', 'Long Island'],
-    vibes : ['Turnt Up', 'Mixer', 'Kick Back'],
     crowdControls: ['Moshpit', 'Packed', 'Spaced', 'Kick back', 'Mixer'],
     partyTypes: {
         public: 'Public',

@@ -57,6 +57,7 @@ router
         check('price', 'Price must be a number').isNumeric(),
         check('about', 'About is required').exists(),
         check('crowdCaution', 'Crowd caution must be a boolean').isBoolean(),
+        check('vibe', 'Vibe must be a valid URL').isURL(),
         check('venueSize', `Venue size must be a number between ${constants.venueSize.min} and ${constants.venueSize.max}`)
             .isInt({ min: constants.venueSize.min, max: constants.venueSize.max }),
         checkSchema(Schema)

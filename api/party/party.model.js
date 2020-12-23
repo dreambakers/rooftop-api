@@ -9,10 +9,7 @@ const partySchema = new Schema({
         enum : constants.bouroughs,
     },
     location: String,
-    vibe: {
-        type: String,
-        enum : constants.vibes,
-    },
+    vibe:  String,
     venueSize: {
         type: Number,
         min: constants.venueSize.min,
