@@ -1,10 +1,11 @@
 const express = require('express');
+const moment = require('moment');
 const router = express.Router();
 const { check, checkSchema } = require('express-validator');
 const controller = require('./party.controller')
 const constants = require('../../constants');
 const authenticate = require('../../middleware/authenticate');
-const moment = require('moment');
+const handleFile = require('../../middleware/handle-file');
 
 const Schema = {
     "bourough": {
@@ -51,7 +52,7 @@ const Schema = {
 }
 
 router
-    .post('/:id?', [ authenticate, [
+    .post('/:id?', [ authenticate, handleFile('cover'), [
         check('title', 'Title is required').exists(),
         check('location', 'Location is required').exists(),
         check('price', 'Price must be a number').isNumeric(),

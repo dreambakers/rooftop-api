@@ -34,7 +34,8 @@ const partySchema = new Schema({
         by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         rating: Number,
         review: String
-    }]
+    }],
+    cover: Buffer
 },{
     timestamps: true
 });
