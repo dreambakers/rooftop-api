@@ -83,7 +83,7 @@ UserSchema.methods.generateToken = function (access, key, expiresIn = '365d') {
 
 UserSchema.statics.findByCredentials = function (username, password) {
     let User = this;
-    return User.findOne({ username }).then((user) => {
+    return User.findOne({ username: { $regex : new RegExp(username, "i") }  }).then((user) => {
         if (!user) {
             return Promise.resolve(null);
         }
