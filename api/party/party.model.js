@@ -35,7 +35,7 @@ const partySchema = new Schema({
         rating: Number,
         review: String
     }],
-    cover: Buffer
+    cover: String
 },{
     timestamps: true
 });

@@ -52,7 +52,7 @@ const Schema = {
 }
 
 router
-    .post('/:id?', [ authenticate, handleFile('cover'), [
+    .post('/:id?', [ authenticate, handleFile('cover', ['image/png','image/jpeg']), [
         check('title', 'Title is required').exists(),
         check('location', 'Location is required').exists(),
         check('price', 'Price must be a number').isNumeric(),

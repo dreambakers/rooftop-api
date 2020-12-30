@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const passport = require('passport');
 const morgan = require('morgan');
+const cors = require('cors')
 const routes = require('./routes/routes');
 const winston = require('./config/winston');
 
@@ -17,6 +18,7 @@ app.use(morgan('combined', { stream: winston.stream }));
 connectDB();
 
 // Init Middleware
+app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
 
