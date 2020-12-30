@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const winston = require('../config/winston');
 
 module.exports = function (req, res, next) {
   // Get token from header
@@ -13,6 +14,7 @@ module.exports = function (req, res, next) {
   try {
     jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
       if (error) {
+        winston.error(error);
         return res.status(401).json({ msg: 'Token is not valid' });
       } else {
         req.user = decoded;
@@ -20,7 +22,7 @@ module.exports = function (req, res, next) {
       }
     });
   } catch (err) {
-    console.error('something wrong with auth middleware');
+    winston.error(err);
     res.status(500).json({ msg: 'Server Error' });
   }
 };
