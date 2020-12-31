@@ -7,7 +7,7 @@ module.exports = function (req, res, next) {
 
   // Check if not token
   if (!token) {
-    return res.status(401).json({ msg: 'No token, authorization denied' });
+    return res.status(400).json({ msg: 'No token, authorization denied' });
   }
 
   // Verify token
@@ -15,7 +15,7 @@ module.exports = function (req, res, next) {
     jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
       if (error) {
         winston.error(error);
-        return res.status(401).json({ msg: 'Token is not valid' });
+        return res.status(400).json({ msg: 'Token is not valid' });
       } else {
         req.user = decoded;
         next();
