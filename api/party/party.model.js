@@ -35,6 +35,7 @@ const partySchema = new Schema({
         rating: Number,
         review: String
     }],
+    hotOrNot: Number,
     cover: String
 },{
     timestamps: true

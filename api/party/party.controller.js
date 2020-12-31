@@ -118,12 +118,19 @@ const rateParty = async (req, res) => {
         };
         if (!party.ratings.length) {
             party.ratings.push(newRating);
+            party.hotOrNot = newRating.rating;
         } else {
             const ratingIndex = party.ratings.findIndex(rating => rating.by.toString() === req.user._id);
             if (ratingIndex >= 0) {
                 party.ratings[ratingIndex] = newRating;
             } else {
                 party.ratings.push(newRating);
+            }
+            // Calculating hotOrNot
+            if (party.ratings.length >= 2) {
+                party.hotOrNot = party.ratings.reduce((ratingObj1, ratingObj2) => ratingObj1.rating + ratingObj2.rating) / party.ratings.length;
+            } else {
+                party.hotOrNot = newRating.rating;
             }
         }
         party = await party.save();
