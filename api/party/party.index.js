@@ -52,19 +52,8 @@ const Schema = {
 }
 
 router
-    .post('/:id?', [ authenticate, handleFile('cover', ['image/png','image/jpeg']), [
-        check('title', 'Title is required').exists(),
-        check('location', 'Location is required').exists(),
-        check('price', 'Price must be a number').isNumeric(),
-        check('about', 'About is required').exists(),
-        check('crowdCaution', 'Crowd caution must be a boolean').isBoolean(),
-        check('vibe', 'Vibe must be a valid URL').isURL(),
-        check('venueSize', `Venue size must be a number between ${constants.venueSize.min} and ${constants.venueSize.max}`)
-            .isInt({ min: constants.venueSize.min, max: constants.venueSize.max }),
-        checkSchema(Schema)
-      ]
-    ], controller.upsertParty)
-    .get('/', [
+    .get('/my/', authenticate, controller.getMyParties)
+    .post('/all/', [
       check('filter.venueSize', `Venue size must be a number between ${constants.venueSize.min} and ${constants.venueSize.max}`).optional()
           .isInt({ min: constants.venueSize.min, max: constants.venueSize.max }),
       check('filter.price', 'Price must be a number').optional().isNumeric(),
@@ -86,12 +75,23 @@ router
         },
       })
     ], controller.getParties)
-    .get('/my/', authenticate, controller.getMyParties)
     .post('/rate/:id', [
       authenticate, [
         check('rating', 'Rating must be an int between 1 and 5').isInt({ min: 1, max: 5 }),
       ]
     ], controller.rateParty)
+    .post('/:id?', [ authenticate, handleFile('cover', ['image/png','image/jpeg']), [
+        check('title', 'Title is required').exists(),
+        check('location', 'Location is required').exists(),
+        check('price', 'Price must be a number').isNumeric(),
+        check('about', 'About is required').exists(),
+        check('crowdCaution', 'Crowd caution must be a boolean').isBoolean(),
+        check('vibe', 'Vibe must be a valid URL').isURL(),
+        check('venueSize', `Venue size must be a number between ${constants.venueSize.min} and ${constants.venueSize.max}`)
+            .isInt({ min: constants.venueSize.min, max: constants.venueSize.max }),
+        checkSchema(Schema)
+      ]
+    ], controller.upsertParty)
     .delete('/:id', authenticate, controller.deleteParty);
 
 module.exports = router;

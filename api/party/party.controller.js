@@ -23,7 +23,7 @@ const upsertParty = async (req, res) => {
                     const party = await Party.findOneAndUpdate({
                         _id: req.params.id,
                         createdBy: req.user._id
-                    }, req.body).exec();
+                    }, req.body, { new: true }).exec();
                     if (!party) {
                         return res.status(400).json({
                             errors: [{ msg: 'No party found against provided ID' }]
