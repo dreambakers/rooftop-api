@@ -67,20 +67,8 @@ router
       check('filter.price', 'Price must be a number').optional().isNumeric(),
       check('filter.crowdCaution', 'Crowd caution must be a boolean').optional().isBoolean(),
       checkSchema({
-        "filter.bourough": {
-          optional: { options: { nullable: true } },
-          isIn: {
-            options: [constants.bouroughs],
-            errorMessage: `Invalid Bourough. Must be one of the following: ${constants.bouroughs.join(', ')}`
-          }
-        },
-        "filter.crowdControl": {
-          optional: { options: { nullable: true } },
-          isIn: {
-            options: [constants.crowdControls],
-            errorMessage: `Invalid crowd control. Must be one of the following: ${constants.crowdControls.join(', ')}`
-          }
-        },
+        "filter.bourough": { ...Schema.bourough, optional: { options: { nullable: true } } },
+        "filter.crowdControl": { ...Schema.crowdControl, optional: { options: { nullable: true } } }
       })
     ], controller.getParties)
     .post('/rate', [
