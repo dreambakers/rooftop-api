@@ -42,7 +42,7 @@ const partySchema = new Schema({
 });
 
 // generating a non-duplicate Code
-partySchema.pre('save', function(next){  
+partySchema.pre('save', function(next){
   let ctx = this;
   attempToGenerate(ctx, next);
 });

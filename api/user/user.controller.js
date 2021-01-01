@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const { User } = require('./user.model');
 const winston = require('../../config/winston');
+const { pick } = require('lodash');
 
 const getProfile = async (req, res) => {
     try {
@@ -13,6 +14,17 @@ const getProfile = async (req, res) => {
         }
     } catch (error) {
         winston.error('An error occurred getting the user profile', error);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+const updateProfile = async (req, res) => {
+    try {
+        let user = pick(req.body, ['profilePicture', 'bio']);
+        user = await User.findByIdAndUpdate(req.user._id, user, { new: true }).exec();
+        res.json({ msg: 'Profile updated', user });
+    } catch (error) {
+        winston.error('An error occurred updating the user profile', error);
         res.status(500).json({ msg: 'Server Error' });
     }
 }
@@ -52,4 +64,5 @@ const changePassword = async (req, res) => {
 module.exports = {
     changePassword,
     getProfile,
+    updateProfile
 }
