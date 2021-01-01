@@ -2,6 +2,7 @@ const express = require('express');
 const moment = require('moment');
 const router = express.Router();
 const { check, checkSchema } = require('express-validator');
+const ObjectID = require("mongodb").ObjectID;
 const controller = require('./party.controller')
 const constants = require('../../constants');
 const authenticate = require('../../middleware/authenticate');
@@ -48,6 +49,13 @@ const Schema = {
         },
         errorMessage: "Start date time should be valid, less than the end date time and should not be in the past"
       }
+    },
+    "partyId": {
+      optional: { options: { nullable: true } },
+      custom: {
+        options: (value) => ObjectID.isValid(value),
+        errorMessage: "Party ID should be valid"
+      }
     }
 }
 
@@ -75,12 +83,15 @@ router
         },
       })
     ], controller.getParties)
-    .post('/rate/:id', [
+    .post('/rate', [
       authenticate, [
         check('rating', 'Rating must be an int between 1 and 5').isInt({ min: 1, max: 5 }),
+        checkSchema({
+          "partyId": { ...Schema.partyId, optional: false }
+        })
       ]
     ], controller.rateParty)
-    .post('/:id?', [ authenticate, handleFile('cover', ['image/png','image/jpeg']), [
+    .post('/', [ authenticate, handleFile('cover', ['image/png','image/jpeg']), [
         check('title', 'Title is required').exists(),
         check('location', 'Location is required').exists(),
         check('price', 'Price must be a number').isNumeric(),
@@ -92,6 +103,10 @@ router
         checkSchema(Schema)
       ]
     ], controller.upsertParty)
-    .delete('/:id', authenticate, controller.deleteParty);
+    .delete('/', authenticate, [
+      checkSchema({
+        "partyId": { ...Schema.partyId, optional: false }
+      })
+    ], controller.deleteParty);
 
 module.exports = router;

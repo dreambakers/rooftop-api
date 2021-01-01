@@ -13,29 +13,23 @@ const upsertParty = async (req, res) => {
         }
 
         // Updating exisiting party
-        if (req.params.id) {
-            if (!ObjectID.isValid(req.params.id)) {
-                return res.status(400).json({
-                    errors: [{ msg: 'Invalid Party ID' }]
-                });
-            } else {
-                try {
-                    const party = await Party.findOneAndUpdate({
-                        _id: req.params.id,
-                        createdBy: req.user._id
-                    }, req.body, { new: true }).exec();
-                    if (!party) {
-                        return res.status(400).json({
-                            errors: [{ msg: 'No party found against provided ID' }]
-                        });
-                    }
-                    return res.json({ msg: 'Party updated', party });
-                } catch (error) {
-                    winston.error("An error occurred while updating the party", error);
-                    throw error;
+        if (req.body.partyId) {
+            try {
+                const party = await Party.findOneAndUpdate({
+                    _id: req.body.partyId,
+                    createdBy: req.user._id
+                }, req.body, { new: true }).exec();
+                if (!party) {
+                    return res.status(400).json({
+                        errors: [{ msg: 'No party found against provided ID' }]
+                    });
                 }
+                return res.json({ msg: 'Party updated', party });
+            } catch (error) {
+                winston.error("An error occurred while updating the party", error);
+                throw error;
             }
-        } 
+        }
         // Creating new party
         else {
             let party = new Party({...req.body, createdBy: req.user._id });
@@ -100,12 +94,7 @@ const rateParty = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        if (!ObjectID.isValid(req.params.id)) {
-            return res.status(400).json({
-                errors: [{ msg: 'Invalid Party ID' }]
-            });
-        } 
-        let party = await Party.findById(req.params.id).exec();
+        let party = await Party.findById(req.body.partyId).exec();
         if (!party) {
             return res.status(400).json({
                 errors: [{ msg: 'No party found against provided ID' }]
@@ -146,19 +135,18 @@ const rateParty = async (req, res) => {
 
 const deleteParty = async (req, res) => {
     try {
-        if (!ObjectID.isValid(req.params.id)) {
-            return res.status(400).json({
-                errors: [{ msg: 'Invalid Party ID' }]
-            });
-        } 
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         const [ party, user ] = await Promise.all([
             Party.findOneAndDelete({
-                _id: req.params.id,
+                _id: req.body.partyId,
                 createdBy: req.user._id
             }).exec(),
             User.findByIdAndUpdate(req.user._id, {
                 $pull: {
-                    parties: new ObjectID(req.params.id)
+                    parties: new ObjectID(req.body.partyId)
                 }
             }).exec()
         ]);
