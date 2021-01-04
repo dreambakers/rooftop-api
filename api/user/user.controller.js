@@ -8,10 +8,34 @@ const getProfile = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user._id }).populate('parties').exec();
         if (user) {
-            res.json({
+            return res.json({
                 user
             });
         }
+        res.status(400).json({
+            errors: [{ msg: 'No user found against the provided token' }]
+        });
+    } catch (error) {
+        winston.error('An error occurred getting the user profile', error);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+const getProfileById = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const user = await User.findById(req.body.userId).populate('parties').exec();
+        if (user) {
+            return res.json({
+                user
+            });
+        }
+        res.status(400).json({
+            errors: [{ msg: 'No user found against the provided token' }]
+        });
     } catch (error) {
         winston.error('An error occurred getting the user profile', error);
         res.status(500).json({ msg: 'Server Error' });
@@ -64,5 +88,6 @@ const changePassword = async (req, res) => {
 module.exports = {
     changePassword,
     getProfile,
+    getProfileById,
     updateProfile
 }
