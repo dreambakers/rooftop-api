@@ -75,6 +75,38 @@ const getParties = async (req, res) => {
     }
 }
 
+const getPartyById = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const { shortId, partyId } = req.body;
+        let party;
+        if (shortId) {
+            party = await Party.findOne({ shortId }).populate('createdBy ratings.by').exec();
+        } else if (partyId) {
+            party = await Party.findById(partyId).populate('createdBy ratings.by').exec();
+        } else {
+            return res.status(400).json({
+                errors: [{ msg: 'shortId or partyId required to get party details' }]
+            });
+        }
+        if (!party) {
+            return res.status(400).json({
+                errors: [{ msg: 'No party found against the provided ID' }]
+            });
+        }
+        res.json({
+            msg: 'Party fetched',
+            party
+        });
+    } catch (error) {
+        winston.error('An error occurred while getting the party', error);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 const getMyParties = async (req, res) => {
     try {
         const parties = await Party.find({ endDateTime: {$gt: new Date()}, createdBy: req.user._id }).populate('ratings.by').exec();
@@ -168,6 +200,7 @@ const deleteParty = async (req, res) => {
 module.exports = {
     upsertParty,
     getParties,
+    getPartyById,
     getMyParties,
     rateParty,
     deleteParty

@@ -56,11 +56,22 @@ const Schema = {
         options: (value) => ObjectID.isValid(value),
         errorMessage: "Party ID should be valid"
       }
+    },
+    "shortId": {
+      optional: { options: { nullable: true } },
+      custom: {
+        options: (value) => /^([a-zA-Z1-9]){8}$/.test(value),
+        errorMessage: "Short ID should be valid"
+      }
     }
 }
 
 router
     .get('/my/', authenticate, controller.getMyParties)
+    .post('/id/', checkSchema({
+      "partyId": Schema.partyId,
+      "shortId": Schema.shortId
+    }), controller.getPartyById)
     .post('/all/', [
       check('filter.venueSize', `Venue size must be a number between ${constants.venueSize.min} and ${constants.venueSize.max}`).optional()
           .isInt({ min: constants.venueSize.min, max: constants.venueSize.max }),

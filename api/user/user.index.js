@@ -8,7 +8,7 @@ const handleFile = require('../../middleware/handle-file');
 
 router
     .get('/', authenticate, controller.getProfile)
-    .get('/id/', [
+    .post('/id/', [
         checkSchema({
             "userId": {
                 custom: {
