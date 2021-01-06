@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 const Schema = mongoose.Schema;
 const constants = require('../../constants');
 
@@ -33,12 +34,22 @@ const partySchema = new Schema({
     ratings: [{
         by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         rating: Number,
-        review: String
+        review: String,
+        isDefault: {
+            type: Boolean,
+            default: false
+        },
     }],
     hotOrNot: Number,
     cover: String
 },{
     timestamps: true
+});
+
+partySchema.post('init', function (party) {
+    if (moment().isAfter(party.endDateTime)) {
+        party.hotOrNot = party.ratings.length === 1 ? 0 : party.hotOrNot;
+    }
 });
 
 // generating a non-duplicate Code

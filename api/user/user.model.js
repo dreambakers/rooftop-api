@@ -68,7 +68,7 @@ UserSchema.methods.toJSON = function () {
         parties: userObject.parties,
         bio: userObject.bio,
         profilePicture: userObject.profilePicture,
-        hotOrNot: calculateHotOrNot(userObject)
+        hotOrNot: calculateHotOrNot(userObject) || 0
     };
 };
 

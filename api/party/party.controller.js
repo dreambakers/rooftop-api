@@ -33,7 +33,12 @@ const upsertParty = async (req, res) => {
         }
         // Creating new party
         else {
-            let party = new Party({...req.body, createdBy: req.user._id });
+            let party = new Party({
+                ...req.body,
+                createdBy: req.user._id,
+                ratings: [{ isDefault: true, rating: 3 }],
+                hotOrNot: 3
+            });
             party = await party.save();
             if (party) {
                 await User.findByIdAndUpdate(req.user._id, { $push: { parties: party } }).exec();
@@ -85,9 +90,9 @@ const getPartyById = async (req, res) => {
         const { shortId, partyId } = req.body;
         let party;
         if (shortId) {
-            party = await Party.findOne({ shortId }).populate('createdBy ratings.by').exec();
+            party = await Party.findOne({ shortId }).populate('createdBy', 'email username').populate('ratings.by').exec();
         } else if (partyId) {
-            party = await Party.findById(partyId).populate('createdBy ratings.by').exec();
+            party = await Party.findById(partyId).populate('createdBy', 'email username').populate('ratings.by').exec();
         } else {
             return res.status(400).json({
                 errors: [{ msg: 'shortId or partyId required to get party details' }]
@@ -147,18 +152,14 @@ const rateParty = async (req, res) => {
             party.ratings.push(newRating);
             party.hotOrNot = newRating.rating;
         } else {
-            const ratingIndex = party.ratings.findIndex(rating => rating.by.toString() === req.user._id);
+            const ratingIndex = party.ratings.findIndex(rating => rating.by && rating.by.toString() === req.user._id);
             if (ratingIndex >= 0) {
                 party.ratings[ratingIndex] = newRating;
             } else {
                 party.ratings.push(newRating);
             }
             // Calculating hotOrNot
-            if (party.ratings.length >= 2) {
-                party.hotOrNot = party.ratings.reduce((ratingObj1, ratingObj2) => ratingObj1.rating + ratingObj2.rating) / party.ratings.length;
-            } else {
-                party.hotOrNot = newRating.rating;
-            }
+            party.hotOrNot = party.ratings.reduce((accumulated, ratingObj) => accumulated + ratingObj.rating, 0) / party.ratings.length;
         }
         party = await party.save();
         res.json({
