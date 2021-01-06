@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator');
+const moment = require('moment');
 const { Party } = require('./party.model');
 const { User } = require('../user/user.model');
 const winston = require('../../config/winston');
@@ -130,6 +131,11 @@ const rateParty = async (req, res) => {
         if (!party) {
             return res.status(400).json({
                 errors: [{ msg: 'No party found against provided ID' }]
+            });
+        }
+        if (!moment().isAfter(moment(party.startDateTime)) || !moment().isBefore(moment(party.endDateTime))) {
+            return res.status(400).json({
+                errors: [{ msg: 'Rating can only be submitted only for an ongoing party' }]
             });
         }
         const newRating = {
