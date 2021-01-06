@@ -3,13 +3,11 @@ const { validationResult } = require('express-validator');
 const { User } = require('./user.model');
 const winston = require('../../config/winston');
 const { pick } = require('lodash');
-const { calculateHotOrNot } = require('../../utility/utility');
 
 const getProfile = async (req, res) => {
     try {
-        const user = await (await User.findOne({ _id: req.user._id }).populate('parties').exec()).toJSON();
+        const user = await User.findOne({ _id: req.user._id }).populate('parties').exec();
         if (user) {
-            calculateHotOrNot(user);
             return res.json({
                 user
             });
@@ -29,9 +27,8 @@ const getProfileById = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        const user = await (await User.findById(req.body.userId).populate('parties', 'hotOrNot endDateTime').exec()).toJSON();
+        const user = await User.findById(req.body.userId).populate('parties', 'hotOrNot endDateTime').exec();
         if (user) {
-            calculateHotOrNot(user);
             return res.json({
                 user
             });
@@ -47,9 +44,15 @@ const getProfileById = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        let user = pick(req.body, ['profilePicture', 'bio']);
+        const editableFields = ['profilePicture', 'bio'];
+        let user = pick(req.body, editableFields);
         user = await User.findByIdAndUpdate(req.user._id, user, { new: true }).exec();
-        res.json({ msg: 'Profile updated', user });
+        res.json({
+            msg: 'Profile updated',
+            user: {
+                ...pick(user, editableFields)
+            }
+        });
     } catch (error) {
         winston.error('An error occurred updating the user profile', error);
         res.status(500).json({ msg: 'Server Error' });

@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const winston = require('../../config/winston');
+const { calculateHotOrNot } = require('../../utility/utility');
 
 const UserSchema = new Schema({
     username: {
@@ -66,7 +67,8 @@ UserSchema.methods.toJSON = function () {
         _id: userObject._id,
         parties: userObject.parties,
         bio: userObject.bio,
-        profilePicture: userObject.profilePicture
+        profilePicture: userObject.profilePicture,
+        hotOrNot: calculateHotOrNot(userObject)
     };
 };
 

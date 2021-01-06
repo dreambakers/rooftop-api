@@ -1,6 +1,6 @@
 const moment = require('moment');
 
-const calculateHotOrNot = async (user) => {
+const calculateHotOrNot = (user) => {
     if (user.parties.length) {
         const endedParties = user.parties.filter(party => moment(party.endDateTime).isBefore(moment()));
 
@@ -14,7 +14,7 @@ const calculateHotOrNot = async (user) => {
             }
         }
 
-        user['hotOrNot'] =  accumulatedRatings ? ( accumulatedRatings / ratedPartiesCount ) : 0;
+        return accumulatedRatings ? ( accumulatedRatings / ratedPartiesCount ) : 0;
     }
 }
 
