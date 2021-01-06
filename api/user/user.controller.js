@@ -3,11 +3,13 @@ const { validationResult } = require('express-validator');
 const { User } = require('./user.model');
 const winston = require('../../config/winston');
 const { pick } = require('lodash');
+const { calculateHotOrNot } = require('../../utility/utility');
 
 const getProfile = async (req, res) => {
     try {
-        const user = await User.findOne({ _id: req.user._id }).populate('parties').exec();
+        const user = await (await User.findOne({ _id: req.user._id }).populate('parties').exec()).toJSON();
         if (user) {
+            calculateHotOrNot(user);
             return res.json({
                 user
             });
@@ -27,8 +29,9 @@ const getProfileById = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        const user = await User.findById(req.body.userId).populate('parties').exec();
+        const user = await (await User.findById(req.body.userId).populate('parties', 'hotOrNot endDateTime').exec()).toJSON();
         if (user) {
+            calculateHotOrNot(user);
             return res.json({
                 user
             });
