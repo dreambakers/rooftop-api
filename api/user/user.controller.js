@@ -44,7 +44,11 @@ const getProfileById = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const editableFields = ['profilePicture', 'bio'];
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const editableFields = ['profilePicture', 'bio', 'tag', 'cashAppProfileUrl', 'zelleProfileUrl', 'spotifyProfileUrl'];
         let user = pick(req.body, editableFields);
         user = await User.findByIdAndUpdate(req.user._id, user, { new: true }).exec();
         res.json({

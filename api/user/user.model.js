@@ -5,6 +5,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const winston = require('../../config/winston');
 const { calculateHotOrNot } = require('../../utility/utility');
+const constants = require('../../constants');
 
 const UserSchema = new Schema({
     username: {
@@ -52,7 +53,14 @@ const UserSchema = new Schema({
         ref: 'Party'
     }],
     bio: String,
-    profilePicture: String
+    profilePicture: String,
+    tag: {
+        type: String,
+        enum: Object.values(constants.tags)
+    },
+    cashAppProfileUrl: String,
+    zelleProfileUrl: String,
+    spotifyProfileUrl: String
 },{
     timestamps: true
 });

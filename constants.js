@@ -17,5 +17,25 @@ module.exports = {
     venueSize: {
         min: 100,
         max: 10000
-    }
+    },
+    tags: [
+        "Host",
+        "DJ",
+        "Musician",
+        "Artists",
+        "Painter",
+        "Security",
+        "Model",
+        "Photographer",
+        "Videographer",
+        "Actor",
+        "Chef",
+        "Caterer",
+        "Dancer",
+        "Promoter",
+        "Tattoo Artist",
+        "Director",
+        "Designer",
+        "Other",
+    ]
 }
