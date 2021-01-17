@@ -27,7 +27,7 @@ const getProfileById = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        const user = await User.findById(req.body.userId).populate('parties', 'hotOrNot endDateTime').exec();
+        const user = await User.findById(req.body.userId).populate('parties').exec();
         if (user) {
             return res.json({
                 user
