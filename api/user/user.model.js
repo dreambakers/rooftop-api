@@ -76,7 +76,11 @@ UserSchema.methods.toJSON = function () {
         parties: userObject.parties,
         bio: userObject.bio,
         profilePicture: userObject.profilePicture,
-        hotOrNot: calculateHotOrNot(userObject) || 0
+        hotOrNot: calculateHotOrNot(userObject) || 0,
+        tag: userObject.tag,
+        cashAppProfileUrl: userObject.cashAppProfileUrl,
+        zelleProfileUrl: userObject.zelleProfileUrl,
+        spotifyProfileUrl: userObject.spotifyProfileUrl
     };
 };
 
