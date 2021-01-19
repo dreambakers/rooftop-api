@@ -37,5 +37,15 @@ module.exports = {
         "Director",
         "Designer",
         "Other",
+    ],
+    userEditableFields:  [
+        'profilePicture',
+        'bio',
+        'tag',
+        'cashAppProfileUrl',
+        'zelleProfileUrl',
+        'spotifyProfileUrl',
+        'twitterProfileUrl',
+        'instagramProfileUrl'
     ]
 }

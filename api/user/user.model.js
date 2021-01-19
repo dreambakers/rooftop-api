@@ -60,7 +60,9 @@ const UserSchema = new Schema({
     },
     cashAppProfileUrl: String,
     zelleProfileUrl: String,
-    spotifyProfileUrl: String
+    spotifyProfileUrl: String,
+    twitterProfileUrl: String,
+    instagramProfileUrl: String
 },{
     timestamps: true
 });
@@ -80,7 +82,9 @@ UserSchema.methods.toJSON = function () {
         tag: userObject.tag,
         cashAppProfileUrl: userObject.cashAppProfileUrl,
         zelleProfileUrl: userObject.zelleProfileUrl,
-        spotifyProfileUrl: userObject.spotifyProfileUrl
+        spotifyProfileUrl: userObject.spotifyProfileUrl,
+        twitterProfileUrl: userObject.twitterProfileUrl,
+        instagramProfileUrl: userObject.instagramProfileUrl
     };
 };
 

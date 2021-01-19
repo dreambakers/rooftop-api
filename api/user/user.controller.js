@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const { User } = require('./user.model');
 const winston = require('../../config/winston');
 const { pick } = require('lodash');
+const constants = require('../../constants');
 
 const getProfile = async (req, res) => {
     try {
@@ -48,7 +49,7 @@ const updateProfile = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        const editableFields = ['profilePicture', 'bio', 'tag', 'cashAppProfileUrl', 'zelleProfileUrl', 'spotifyProfileUrl'];
+        const editableFields = constants.userEditableFields;
         let user = pick(req.body, editableFields);
         user = await User.findByIdAndUpdate(req.user._id, user, { new: true }).exec();
         res.json({

@@ -36,6 +36,20 @@ const Schema = {
         isURL: {
           errorMessage: `spotifyProfileUrl must be a valid URL`
         }
+    },
+    "twitterProfileUrl": {
+      in: 'body',
+      optional: { options: { nullable: true } },
+      isURL: {
+        errorMessage: `twitterProfileUrl must be a valid URL`
+      }
+    },
+    "instagramProfileUrl": {
+        in: 'body',
+        optional: { options: { nullable: true } },
+        isURL: {
+          errorMessage: `instagramProfileUrl must be a valid URL`
+        }
     }
 }
 
